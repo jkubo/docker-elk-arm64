@@ -6,6 +6,8 @@
 # Build stage 0
 # Extract Kibana and make various file manipulations.
 ################################################################################
+ARG ELK_VERSION
+
 FROM centos:7 AS prep_files
 
 # Install toolchain to build dumb-init
@@ -14,10 +16,10 @@ RUN yum install -y glibc-static gcc make
 RUN mkdir /usr/share/kibana
 WORKDIR /usr/share/kibana
 
-RUN curl -sL https://artifacts.elastic.co/downloads/kibana/kibana-oss-7.6.2-linux-x86_64.tar.gz | tar --strip-components=1 -zxf -
+RUN curl -sL https://artifacts.elastic.co/downloads/kibana/kibana-oss-7.9.3-linux-x86_64.tar.gz | tar --strip-components=1 -zxf -
 # replace amd64 node with arm64
 RUN rm -rf /usr/share/kibana/node/* && \
-    curl -sL https://nodejs.org/dist/v10.19.0/node-v10.19.0-linux-arm64.tar.gz | tar -C /usr/share/kibana/node/ --strip-components=1 -xzf -
+    curl -sL https://nodejs.org/dist/v10.22.1/node-v10.22.1-linux-arm64.tar.gz | tar -C /usr/share/kibana/node/ --strip-components=1 -xzf -
 
 # compile dumb-init from sources
 RUN mkdir -p /opt/dumb-init
@@ -66,7 +68,7 @@ RUN chmod g+ws /usr/share/kibana && find /usr/share/kibana -gid 0 -and -not -per
 RUN groupadd --gid 1000 kibana && useradd --uid 1000 --gid 1000 --home-dir /usr/share/kibana --no-create-home kibana
 USER kibana
 
-LABEL org.label-schema.schema-version="1.0" org.label-schema.vendor="Elastic" org.label-schema.name="kibana" org.label-schema.version="7.6.2-SNAPSHOT" org.label-schema.url="https://www.elastic.co/products/kibana" org.label-schema.vcs-url="https://github.com/elastic/kibana" org.label-schema.license="ASL 2.0" org.label-schema.usage="https://www.elastic.co/guide/en/kibana/index.html" org.label-schema.build-date="2020-04-11T05:35:13.592Z" license="ASL 2.0"
+LABEL org.label-schema.schema-version="1.0" org.label-schema.vendor="Elastic" org.label-schema.name="kibana" org.label-schema.version="${ELK_VERSION}-SNAPSHOT" org.label-schema.url="https://www.elastic.co/products/kibana" org.label-schema.vcs-url="https://github.com/elastic/kibana" org.label-schema.license="ASL 2.0" org.label-schema.usage="https://www.elastic.co/guide/en/kibana/index.html" org.label-schema.build-date="2020-04-11T05:35:13.592Z" license="ASL 2.0"
 
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 

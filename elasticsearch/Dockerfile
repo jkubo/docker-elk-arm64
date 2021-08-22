@@ -11,6 +11,8 @@
 # Set gid=0 and make group perms==owner perms
 ################################################################################
 
+ARG ELK_VERSION
+
 FROM centos:7 AS builder
 
 RUN for iter in {1..10}; do yum update --setopt=tsflags=nodocs -y &&     yum install --setopt=tsflags=nodocs -y gzip shadow-utils tar &&     yum clean all && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; done;     (exit $exit_code)
@@ -21,7 +23,7 @@ RUN groupadd -g 1000 elasticsearch &&     adduser -u 1000 -g 1000 -d /usr/share/
 
 WORKDIR /usr/share/elasticsearch
 
-RUN curl -sL https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-7.6.2-no-jdk-linux-x86_64.tar.gz | tar --strip-components=1 -zxf -
+RUN curl -sL https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-7.9.3-no-jdk-linux-x86_64.tar.gz | tar --strip-components=1 -zxf -
 RUN grep ES_DISTRIBUTION_TYPE=tar /usr/share/elasticsearch/bin/elasticsearch-env     && sed -i -e 's/ES_DISTRIBUTION_TYPE=tar/ES_DISTRIBUTION_TYPE=docker/' /usr/share/elasticsearch/bin/elasticsearch-env
 RUN curl -sL http://download.bell-sw.com/java/13.0.2+9/bellsoft-jdk13.0.2+9-linux-aarch64.tar.gz | tar -C /opt -zxf -
 RUN mkdir -p config data logs
@@ -63,7 +65,7 @@ RUN chgrp 0 /usr/local/bin/docker-entrypoint.sh &&     chmod g=u /etc/passwd && 
 
 EXPOSE 9200 9300
 
-LABEL org.label-schema.build-date="2020-04-10T20:50:35.705861Z"   org.label-schema.license="Apache-2.0"   org.label-schema.name="Elasticsearch"   org.label-schema.schema-version="1.0"   org.label-schema.url="https://www.elastic.co/products/elasticsearch"   org.label-schema.usage="https://www.elastic.co/guide/en/elasticsearch/reference/index.html"   org.label-schema.vcs-ref="ef48eb35cf30adf4db14086e8aabd07ef6fb113f"   org.label-schema.vcs-url="https://github.com/elastic/elasticsearch"   org.label-schema.vendor="Elastic"   org.label-schema.version="7.6.2-SNAPSHOT"   org.opencontainers.image.created="2020-04-10T20:50:35.705861Z"   org.opencontainers.image.documentation="https://www.elastic.co/guide/en/elasticsearch/reference/index.html"   org.opencontainers.image.licenses="Apache-2.0"   org.opencontainers.image.revision="ef48eb35cf30adf4db14086e8aabd07ef6fb113f"   org.opencontainers.image.source="https://github.com/elastic/elasticsearch"   org.opencontainers.image.title="Elasticsearch"   org.opencontainers.image.url="https://www.elastic.co/products/elasticsearch"   org.opencontainers.image.vendor="Elastic"   org.opencontainers.image.version="7.6.2-SNAPSHOT"
+LABEL org.label-schema.build-date="2020-04-10T20:50:35.705861Z"   org.label-schema.license="Apache-2.0"   org.label-schema.name="Elasticsearch"   org.label-schema.schema-version="1.0"   org.label-schema.url="https://www.elastic.co/products/elasticsearch"   org.label-schema.usage="https://www.elastic.co/guide/en/elasticsearch/reference/index.html"   org.label-schema.vcs-ref="ef48eb35cf30adf4db14086e8aabd07ef6fb113f"   org.label-schema.vcs-url="https://github.com/elastic/elasticsearch"   org.label-schema.vendor="Elastic"   org.label-schema.version="${ELK_VERSION}-SNAPSHOT"   org.opencontainers.image.created="2020-04-10T20:50:35.705861Z"   org.opencontainers.image.documentation="https://www.elastic.co/guide/en/elasticsearch/reference/index.html"   org.opencontainers.image.licenses="Apache-2.0"   org.opencontainers.image.revision="ef48eb35cf30adf4db14086e8aabd07ef6fb113f"   org.opencontainers.image.source="https://github.com/elastic/elasticsearch"   org.opencontainers.image.title="Elasticsearch"   org.opencontainers.image.url="https://www.elastic.co/products/elasticsearch"   org.opencontainers.image.vendor="Elastic"   org.opencontainers.image.version="${ELK_VERSION}-SNAPSHOT"
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 # Dummy overridable parameter parsed by entrypoint
